@@ -28,22 +28,26 @@
 			$("#test").on("click", function(){
 		    	$.getJSON("device.json", function(device){
 		    		$.each(device, function(index, item){
-		    			if (item.type == 'CCTV') {
-		    				console.log(item.mobileUrl);
+		    			if (item.type == 'CCTV') {		    				
+		    				var img = "<img id='cctvIframe' src='"+item.mobileUrl+"' width='320px' height='240px' onload='refreshMJpeg(this, \""+item.mobileUrl+"\")' />";
+		    				$("#camera").append(img);
 		    			}
 		    		});
 		   	 	});
 			});
+
 		});
 
-		// function refreshMJpeg(obj, url){
-		//     if($("#cctvIframe").length > 0 && isCctvPause === false){
-		//         cctvTimer = setTimeout(function(){
-		//             lastCctvUrl = obj.src;
-		//             obj.src = url + "?t=" + new Date().getTime();
-		//         },100);
-		//     }
-		// }
+		var cctvTimer;
+		function refreshMJpeg(obj, url){
+		    // if($("#cctvIframe").length > 0 && isCctvPause === false){
+		    if($("#cctvIframe").length > 0){
+		        cctvTimer = setTimeout(function(){
+		            // lastCctvUrl = obj.src;
+		            obj.src = url + "?t=" + new Date().getTime();
+		        },100);
+		    }
+		}
 	</script>
 
 	<style>
@@ -64,5 +68,7 @@
 	<hr>
 
 	<div id="map"></div>
+
+	<div id="camera"></div>
 </body>
 </html>
