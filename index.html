@@ -24,7 +24,26 @@
 					}
 				);
 			});
+
+			$("#test").on("click", function(){
+		    	$.getJSON("device.json", function(device){
+		    		$.each(device, function(index, item){
+		    			if (item.type == 'CCTV') {
+		    				console.log(item.mobileUrl);
+		    			}
+		    		});
+		   	 	});
+			});
 		});
+
+		// function refreshMJpeg(obj, url){
+		//     if($("#cctvIframe").length > 0 && isCctvPause === false){
+		//         cctvTimer = setTimeout(function(){
+		//             lastCctvUrl = obj.src;
+		//             obj.src = url + "?t=" + new Date().getTime();
+		//         },100);
+		//     }
+		// }
 	</script>
 
 	<style>
@@ -41,6 +60,7 @@
 	<input type="text" id="to" />
 	<button id="submit">送出</button>
 
+	<button id="test">test</button>
 	<hr>
 
 	<div id="map"></div>
