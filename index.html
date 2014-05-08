@@ -12,15 +12,7 @@
 			var cctvTimer;
 			var map;			
 			var dirService;
-			var dirDisplay;
-
-			function refreshMJpeg(obj, url){
-			    if($("#cctvIframe").length > 0){
-			        cctvTimer = setTimeout(function(){
-			            obj.src = url + "?t=" + new Date().getTime();
-			        },100);
-			    }
-			}
+			var dirDisplay;		
 
 			function setCCTViFrame() {
 				$.getJSON("cctv.json", function(cctv){
@@ -29,6 +21,7 @@
 							return false;
 						}
 						var img = "<img src='"+item.url+"' width='320px' height='240px' />";
+						console.log(item.lng + " , " + item.lat);
 						$("#camera").append(img);
 					});
 				});			
@@ -80,9 +73,11 @@
 					if (status == google.maps.DirectionsStatus.OK) {
                         dirDisplay.setDirections(response);
                         var path = response.routes[0].overview_polyline.points;
-                        console.log(response);
+                        // console.log(response);
                         var decodeStr = google.maps.geometry.encoding.decodePath(path);
-                        console.log(decodeStr);
+                        $.each(decodeStr, function(index, item){
+                        	console.log(item.A +", "+item.k);
+                        });                        
                 	}
 				});
 			});
@@ -94,7 +89,19 @@
 		 	$("#device").on("click", function(){
 		    	setDeviceImg();
 		 	});
+
+		 	$("#clear").on("click", function(){
+		 		$("#camera").empty();
+		 	});
 		});		 	
+	
+		function refreshMJpeg(obj, url){
+		    if($("#cctvIframe").length > 0){
+		        cctvTimer = setTimeout(function(){
+		            obj.src = url + "?t=" + new Date().getTime();
+		        },100);
+		    }
+		}
 
 	</script>
 
@@ -115,6 +122,7 @@
 
 	<button id="cctv">cctv</button>
 	<button id="device">device</button>
+	<button id="clear">clear</button>
 	<hr>
 
 	<div id="map"></div>
