@@ -52,7 +52,10 @@
 				dirService.route(request, function(response, status) {
 					if (status == google.maps.DirectionsStatus.OK) {
                         dirDisplay.setDirections(response);
+                        var path = response.routes[0].overview_polyline.points;
                         console.log(response);
+                        var decodeStr = google.maps.geometry.encoding.decodePath(path);
+                        console.log(decodeStr);
                 	}
 				});
 			});
