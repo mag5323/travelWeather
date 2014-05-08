@@ -14,13 +14,13 @@
 			var dirService;
 			var dirDisplay;
 
-			// function refreshMJpeg(obj, url){
-			//     if($("#cctvIframe").length > 0){
-			//         cctvTimer = setTimeout(function(){
-			//             obj.src = url + "?t=" + new Date().getTime();
-			//         },100);
-			//     }
-			// }
+			function refreshMJpeg(obj, url){
+			    if($("#cctvIframe").length > 0){
+			        cctvTimer = setTimeout(function(){
+			            obj.src = url + "?t=" + new Date().getTime();
+			        },100);
+			    }
+			}
 
 			function setCCTViFrame() {
 				$.getJSON("cctv.json", function(cctv){
@@ -86,33 +86,15 @@
                 	}
 				});
 			});
-		});
 
-		// function refreshMJpeg(obj, url){
-		//     if($("#cctvIframe").length > 0 && isCctvPause === false){
-		//         cctvTimer = setTimeout(function(){
-		//             lastCctvUrl = obj.src;
-		//             obj.src = url + "?t=" + new Date().getTime();
-		//         },100);
-		//     }
-		// }
+			$("#cctv").on("click", function(){
+	    		setCCTViFrame();
+		 	});
 
-		var cctvTimer;
-		function refreshMJpeg(obj, url){
-		    if($("#cctvIframe").length > 0){
-		        cctvTimer = setTimeout(function(){
-		            obj.src = url + "?t=" + new Date().getTime();
-		        },100);
-		    }
-		}
-
-	 	$("#cctv").on("click", function(){
-	    	setCCTViFrame();
-	 	});
-
-	 	$("#device").on("click", function(){
-	    	setDeviceImg();
-	 	});
+		 	$("#device").on("click", function(){
+		    	setDeviceImg();
+		 	});
+		});		 	
 
 	</script>
 
