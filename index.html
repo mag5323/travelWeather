@@ -3,8 +3,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<script src="http://maps.google.com/maps/api/js?sensor=false"></script>	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"></script>
-	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+	<!--<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"></script>
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">-->
 	<script>
 		$(document).ready(function(){			
 
@@ -12,19 +12,30 @@
 			var map;			
 			var dirService;
 			var dirDisplay;
-			var routePolygon;			
+			var routePolygon;
 
 			init();
 
 			function setCCTViFrame() {
 				$.getJSON("cctv.json", function(cctv){
 					$.each(cctv, function(index, item){
-						if (index == 5){
-							return false;
-						}
-						var img = "<img src='"+item.url+"' width='320px' height='240px' />";
-						console.log(item.lng + " , " + item.lat);
-						$("#camera").append(img);
+						var myLatlng = new google.maps.LatLng(item.lat, item.lng);
+						var cctvMarker = new google.maps.Marker({
+						    position: myLatlng,
+						    title: item.lat +","+ item.lng
+						});
+
+						cctvMarker.setMap(map);
+
+						google.maps.event.addListener(cctvMarker, 'click', function() {
+						    map.setCenter(cctvMarker.getPosition());
+
+						    var infoWindow = new google.maps.InfoWindow({
+								content: "<img src='"+item.url+"' width='320px' height='240px' />"
+							});
+
+							infoWindow.open(map, cctvMarker);
+					    });
 					});
 				});			
 			}
@@ -32,13 +43,23 @@
 			function setDeviceImg() {
 				$.getJSON("device.json", function(device){
 		    		$.each(device, function(index, item){
-		    			if (index == 5){
-							return false;
-						}
+		    			if (item.type == 'CCTV') {
+		    				var myLatlng = new google.maps.LatLng(item.wgsy, item.wgsx);
+							var deviceMarker = new google.maps.Marker({
+							    position: myLatlng,
+							    title: item.wgsy +","+ item.wgsx
+							});
+							deviceMarker.setMap(map);
 
-		    			if (item.type == 'CCTV') {		
-		    				var img = "<img id='cctvIframe' src='"+item.mobileUrl+"' width='320px' height='240px' onload='refreshMJpeg(this, \""+item.mobileUrl+"\")' />";
-		    				$("#camera").append(img);
+							google.maps.event.addListener(deviceMarker, 'click', function() {
+							    map.setCenter(deviceMarker.getPosition());
+
+							    var infoWindow = new google.maps.InfoWindow({
+									content: "<img id='cctvIframe' src='"+item.mobileUrl+"' width='320px' height='240px' onload='refreshMJpeg(this, \""+item.mobileUrl+"\")' />"
+								});
+
+								infoWindow.open(map, deviceMarker);
+					    	});
 		    			}
 		    		});
 		   	 	});
@@ -47,7 +68,7 @@
 			/* google map initialize */
 
 			function init() {
-				var deviceLen = position[0].length+1;
+				// var deviceLen = position[0].length+1;
 				var i;
 				var mapOptions = {
 					zoom: 8,
@@ -65,7 +86,7 @@
 
  				$.getJSON("cctv.json", function(cctvs){
 	    			$.each(cctvs, function(index, cctv){
-	    				i = deviceLen+index;
+	    				// i = deviceLen+index;
 
 	    				var x = cctv.lng;
 	    				var y = cctv.lat;
@@ -99,7 +120,7 @@
                         	console.log(path.A +", "+path.k);
                         });*/
                 	}
-				});
+				});				
 			});
 
 			$("#cctv").on("click", function(){
@@ -111,7 +132,7 @@
 		 	});
 
 		 	$("#clear").on("click", function(){
-		 		$("#camera").empty();
+		 		init();
 		 	});
 		});		 	
 	
@@ -127,8 +148,8 @@
 
 	<style>
 		#map {
-			height: 360px;
-			width: 	640px;
+			height: 700px;
+			width: 	1200px;
 		}
 	</style>
 </head>
