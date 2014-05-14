@@ -16,57 +16,87 @@
 
 			init();
 
-			function setCCTViFrame() {
-				$.getJSON("cctv.json", function(cctv){
-					$.each(cctv, function(index, item){
-						var myLatlng = new google.maps.LatLng(item.lat, item.lng);
-						var cctvMarker = new google.maps.Marker({
-						    position: myLatlng,
-						    title: item.lat +","+ item.lng
+			function setUpCamera(camera) {
+				var myLatlng = new google.maps.LatLng(camera.lat, camera.lng);
+				var infoWindow;
+				var marker = new google.maps.Marker({
+				    position: myLatlng
+				});
+
+				marker.setMap(map);
+
+				google.maps.event.addListener(marker, 'click', function() {
+				    map.setCenter(marker.getPosition());
+
+				    if (camera.url.indexOf("snapshot") > -1) {
+				    	infoWindow = new google.maps.InfoWindow({
+									content: "<img class='snap' src='"+camera.url+"' width='320px' height='240px' onload='refreshMJpeg(this, \""+camera.url+"\")' />"
 						});
 
-						cctvMarker.setMap(map);
+				    }else {
+				    	infoWindow = new google.maps.InfoWindow({
+									content: "<img src='"+camera.url+"' width='320px' height='240px' />"
+						});	
+				    }				    
 
-						google.maps.event.addListener(cctvMarker, 'click', function() {
-						    map.setCenter(cctvMarker.getPosition());
-
-						    var infoWindow = new google.maps.InfoWindow({
-								content: "<img src='"+item.url+"' width='320px' height='240px' />"
-							});
-
-							infoWindow.open(map, cctvMarker);
-					    });
-					});
-				});			
+					infoWindow.open(map, marker);
+			    });
 			}
 
-			function setDeviceImg() {
-				$.getJSON("device.json", function(device){
-		    		$.each(device, function(index, item){
-		    			if (item.type == 'CCTV') {
-		    				var myLatlng = new google.maps.LatLng(item.wgsy, item.wgsx);
-							var deviceMarker = new google.maps.Marker({
-							    position: myLatlng,
-							    title: item.wgsy +","+ item.wgsx
-							});
-							deviceMarker.setMap(map);
+			/* classify routing path's point */
+			function classify(item){
+			    if (item.A>121.0) {
+					if (item.k>25.0) {
+					    return 0;
+					}
 
-							google.maps.event.addListener(deviceMarker, 'click', function() {
-							    map.setCenter(deviceMarker.getPosition());
+					if (item.k>24.5) {
+					    return 2;
+					}
 
-							    var infoWindow = new google.maps.InfoWindow({
-									content: "<img id='cctvIframe' src='"+item.mobileUrl+"' width='320px' height='240px' onload='refreshMJpeg(this, \""+item.mobileUrl+"\")' />"
-								});
+					if (item.k>24.0) {	
+					    return 4;
+					}
 
-								infoWindow.open(map, deviceMarker);
-					    	});
-		    			}
-		    		});
-		   	 	});
+					if (item.k>23.5) {
+					    return 6;
+					}
+
+					if (item.k>23.0) {
+					    return 8;
+					}
+
+					if (item.k>22.5) {
+					    return 10;
+					}
+			    } else {
+					if (item.k>24.5) {
+					  return 1;
+					}
+					
+					if (item.k>24.0) {	
+					  return 3;
+					}
+
+					if (item.k>23.5) {
+					  return 5;
+					}
+
+					if (item.k>23.0) {
+					  return 7;
+					}
+
+					if (item.k>22.5) {
+					  return 9;
+					}
+
+					if (item.k>21.5) {
+					  return 11;
+					}
+			    }
 			}
 
 			/* google map initialize */
-
 			function init() {
 				// var deviceLen = position[0].length+1;
 				var i;
@@ -76,26 +106,9 @@
 					mapTypeId: google.maps.MapTypeId.ROADMAP
 				}
 				map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-				$.getJSON("device.json", function(devices){
-					$.each(devices, function(i, device){
-	    				var x = device.wgsx;
-	    				var y = device.wgsy;
-					});
- 				});			
-
- 				$.getJSON("cctv.json", function(cctvs){
-	    			$.each(cctvs, function(index, cctv){
-	    				// i = deviceLen+index;
-
-	    				var x = cctv.lng;
-	    				var y = cctv.lat;
-	    			});
- 				});
 			}
 
 			/* route service/display constructing, map target*/
-
 			$("#submit").on("click", function(){
 				dirService = new google.maps.DirectionsService();
 				dirDisplay = new google.maps.DirectionsRenderer();
@@ -114,22 +127,24 @@
 					if (status == google.maps.DirectionsStatus.OK) {
                         dirDisplay.setDirections(response);
                         var path = response.routes[0].overview_polyline.points;
-                        var decodeStr = google.maps.geometry.encoding.decodePath(path);					
+                        var points = google.maps.geometry.encoding.decodePath(path);		
 
-						/*$.each(decodeStr, function(index, path){
-                        	console.log(path.A +", "+path.k);
-                        });*/
+                        $.getJSON("camera.json", function(cameras){
+	                        
+	                        for (var i=0; i<points.length; i+=5) {
+	                        	
+	                        	var group = classify(points[i]);           
+
+	                        	$.each(cameras[group], function(i, camera){                      		
+	                        		if google.maps.geometry.poly.containsLocation(location, poly) {
+	                        			setUpCamera(camera);
+	                        		}
+	                        	});
+	                        }
+	                    });
                 	}
 				});				
 			});
-
-			$("#cctv").on("click", function(){
-	    		setCCTViFrame();
-		 	});
-
-		 	$("#device").on("click", function(){
-		    	setDeviceImg();
-		 	});
 
 		 	$("#clear").on("click", function(){
 		 		init();
@@ -137,7 +152,7 @@
 		});		 	
 	
 		function refreshMJpeg(obj, url){
-		    if($("#cctvIframe").length > 0){
+		    if( $(".snap").length > 0 ){
 		        cctvTimer = setTimeout(function(){
 		            obj.src = url + "?t=" + new Date().getTime();
 		        },100);
@@ -161,8 +176,6 @@
 	<button id="submit">送出</button>
 	<hr>
 
-	<button id="cctv">cctv</button>
-	<button id="device">device</button>
 	<button id="clear">clear</button>
 	<hr>
 
