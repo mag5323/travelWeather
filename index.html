@@ -17,6 +17,7 @@
 
 			init();
 
+			/* add click listener/infowindow/marker */
 			function setUpCamera(camera) {
 				var myLatlng = new google.maps.LatLng(camera.lat, camera.lng);
 				
@@ -31,7 +32,6 @@
 				    closeInfoWindow();
 
 				    map.setCenter(marker.getPosition());
-
 				    if (camera.url.indexOf("snapshot") > -1) {
 				    	infoWindow = new google.maps.InfoWindow({
 									content: "<img class='snap' src='"+camera.url+"' width='320px' height='240px' onload='refreshMJpeg(this, \""+camera.url+"\")' />"
@@ -46,20 +46,6 @@
 				    infoWindow.open(map, marker);	
 			    });
 			}
-
-			// function setUpMarker(point) {
-			// 	var myLatlng = new google.maps.LatLng(point.k, point.A);
-			// 	var marker = new google.maps.Marker({
-			// 	    position: myLatlng,
-			// 	    title: point.k +","+ point.A,
-			// 	    icon: {
-			// 	      path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-			// 	      scale: 3
-			// 	    }
-			// 	});
-
-			// 	marker.setMap(map);
-			// }
 
 			/* classify routing path's point */
 			function classify(item){
@@ -114,6 +100,8 @@
 			    }
 			}
 
+			/*  checking if the camera is on the route
+				by calculating their straight-line distance */
 			function isOnThePath(point, camera) {
 				var xSum = Math.pow(point.k-camera.lat, 2);
 				var ySum = Math.pow(point.A-camera.lng, 2);
@@ -122,40 +110,9 @@
 					return true;
 				}
 				return false;
-
-				// var x = new google.maps.LatLng(point.k, point.A);
-				// var y = new google.maps.LatLng(camera.lat, camera.lng);
-				// var dist = google.maps.geometry.spherical.computeDistanceBetween (x, y);
-				// if (dist<450){
-				// 	return true;
-				// }				
-				// return false;
 			}
 
-			// function resetMap() {
-			// 	var p = 1-getEmptyPathToPointsColumn();
-				
-			// 	$.each(pathToPoints[p], function(i, point){
-			// 		var marker = new google.maps.Marker({
-			// 		    position: new google.maps.LatLng(point.k, point.A)
-			// 		});
-			// 		marker.setMap(null);
-			// 	});		
-
-			// 	console.log(pathToPoints);
-			// }
-
-			// function pushPoint(p, point) {
-			// 	pathToPoints[p].push(point);
-			// }
-
-			// function getEmptyPathToPointsColumn() {		
-			// 	if (pathToPoints[0].length<1) {
-			// 		return 0;
-			// 	}
-			// 	return 1;
-			// }
-
+			/* close other infowindow */
 			function closeInfoWindow(){
 			    if(infoWindow != null){
 			        infoWindow.close();
@@ -176,7 +133,7 @@
 				map = new google.maps.Map(document.getElementById("map"), mapOptions);
 			}
 
-			/* route service/display constructing, map target*/
+			/* route service/display constructing, map target */
 			$("#submit").on("click", function(){
 
 				dirService = new google.maps.DirectionsService();
@@ -196,19 +153,18 @@
 					if (status == google.maps.DirectionsStatus.OK) {
                         dirDisplay.setDirections(response);
 
+                        /* change route into points array */
                         var path = response.routes[0].overview_polyline.points;
                         var points = google.maps.geometry.encoding.decodePath(path);	
                         
-                        $.getJSON("camera.json", function(cameras){                        	
-                        	// var p = getEmptyPathToPointsColumn();
+                        $.getJSON("camera.json", function(cameras){          
 
+                        	/* roughly iterating points array by 5 step */
 	                        for (var i=0; i<points.length; i+=5) {  
-	                        	// setUpMarker(points[i]);
 	                        	var group = classify(points[i]);   
 	                        	
 	                        	$.each(cameras[group], function(j, camera){     
 	                        		if (isOnThePath(points[i], camera)) {
-	                        			// pushPoint(p, points[i]);
 	                        			setUpCamera(camera);
 	                        		}
 	                        	});
@@ -216,8 +172,6 @@
 	                    });
                 	}
 				});			
-
-				// resetMap();	
 			});
 
 		 	$("#clear").on("click", function(){
