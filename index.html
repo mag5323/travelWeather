@@ -12,20 +12,24 @@
 			var map;			
 			var dirService;
 			var dirDisplay;
-			var routePolygon;
+			var pathToPoints = [[2],[]];
+			var infoWindow;
 
 			init();
 
 			function setUpCamera(camera) {
 				var myLatlng = new google.maps.LatLng(camera.lat, camera.lng);
-				var infoWindow;
+				
 				var marker = new google.maps.Marker({
-				    position: myLatlng
+				    position: myLatlng,
+				    title: camera.lat +","+ camera.lng
 				});
 
 				marker.setMap(map);
 
 				google.maps.event.addListener(marker, 'click', function() {
+				    closeInfoWindow();
+
 				    map.setCenter(marker.getPosition());
 
 				    if (camera.url.indexOf("snapshot") > -1) {
@@ -35,13 +39,27 @@
 
 				    }else {
 				    	infoWindow = new google.maps.InfoWindow({
-									content: "<img src='"+camera.url+"' width='320px' height='240px' />"
+									content: "<img class='cctv' src='"+camera.url+"' width='320px' height='240px' />"
 						});	
 				    }				    
 
-					infoWindow.open(map, marker);
+				    infoWindow.open(map, marker);	
 			    });
 			}
+
+			// function setUpMarker(point) {
+			// 	var myLatlng = new google.maps.LatLng(point.k, point.A);
+			// 	var marker = new google.maps.Marker({
+			// 	    position: myLatlng,
+			// 	    title: point.k +","+ point.A,
+			// 	    icon: {
+			// 	      path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+			// 	      scale: 3
+			// 	    }
+			// 	});
+
+			// 	marker.setMap(map);
+			// }
 
 			/* classify routing path's point */
 			function classify(item){
@@ -96,6 +114,56 @@
 			    }
 			}
 
+			function isOnThePath(point, camera) {
+				var xSum = Math.pow(point.k-camera.lat, 2);
+				var ySum = Math.pow(point.A-camera.lng, 2);
+				var distance = Math.sqrt(xSum+ySum);
+				if (Math.abs(Math.floor(distance)-distance) < 0.005) {					
+					return true;
+				}
+				return false;
+
+				// var x = new google.maps.LatLng(point.k, point.A);
+				// var y = new google.maps.LatLng(camera.lat, camera.lng);
+				// var dist = google.maps.geometry.spherical.computeDistanceBetween (x, y);
+				// if (dist<450){
+				// 	return true;
+				// }				
+				// return false;
+			}
+
+			// function resetMap() {
+			// 	var p = 1-getEmptyPathToPointsColumn();
+				
+			// 	$.each(pathToPoints[p], function(i, point){
+			// 		var marker = new google.maps.Marker({
+			// 		    position: new google.maps.LatLng(point.k, point.A)
+			// 		});
+			// 		marker.setMap(null);
+			// 	});		
+
+			// 	console.log(pathToPoints);
+			// }
+
+			// function pushPoint(p, point) {
+			// 	pathToPoints[p].push(point);
+			// }
+
+			// function getEmptyPathToPointsColumn() {		
+			// 	if (pathToPoints[0].length<1) {
+			// 		return 0;
+			// 	}
+			// 	return 1;
+			// }
+
+			function closeInfoWindow(){
+			    if(infoWindow != null){
+			        infoWindow.close();
+			        clearTimeout(cctvTimer);
+			        $(".snap, .cctv").remove();			        
+			    }
+			}
+
 			/* google map initialize */
 			function init() {
 				// var deviceLen = position[0].length+1;
@@ -110,6 +178,7 @@
 
 			/* route service/display constructing, map target*/
 			$("#submit").on("click", function(){
+
 				dirService = new google.maps.DirectionsService();
 				dirDisplay = new google.maps.DirectionsRenderer();
 				dirDisplay.setMap(map);
@@ -126,24 +195,29 @@
 				dirService.route(request, function(response, status) {
 					if (status == google.maps.DirectionsStatus.OK) {
                         dirDisplay.setDirections(response);
+
                         var path = response.routes[0].overview_polyline.points;
-                        var points = google.maps.geometry.encoding.decodePath(path);		
+                        var points = google.maps.geometry.encoding.decodePath(path);	
+                        
+                        $.getJSON("camera.json", function(cameras){                        	
+                        	// var p = getEmptyPathToPointsColumn();
 
-                        $.getJSON("camera.json", function(cameras){
-	                        
-	                        for (var i=0; i<points.length; i+=5) {
+	                        for (var i=0; i<points.length; i+=5) {  
+	                        	// setUpMarker(points[i]);
+	                        	var group = classify(points[i]);   
 	                        	
-	                        	var group = classify(points[i]);           
-
-	                        	$.each(cameras[group], function(i, camera){                      		
-	                        		if google.maps.geometry.poly.containsLocation(location, poly) {
+	                        	$.each(cameras[group], function(j, camera){     
+	                        		if (isOnThePath(points[i], camera)) {
+	                        			// pushPoint(p, points[i]);
 	                        			setUpCamera(camera);
 	                        		}
 	                        	});
 	                        }
 	                    });
                 	}
-				});				
+				});			
+
+				// resetMap();	
 			});
 
 		 	$("#clear").on("click", function(){
@@ -174,8 +248,6 @@
 	<label for="to">終點</label>
 	<input type="text" id="to" value="高雄市楠梓區" />
 	<button id="submit">送出</button>
-	<hr>
-
 	<button id="clear">clear</button>
 	<hr>
 
