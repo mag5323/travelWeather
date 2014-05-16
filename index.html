@@ -121,6 +121,16 @@
 			    }
 			}
 
+			/* getting From location*/
+			function getFrom() {
+				return $("#from").val();				
+			}
+
+			/* getting To location*/
+			function getTo() {
+				return to = $("#to").val();
+			}
+
 			/* google map initialize */
 			function init() {
 				// var deviceLen = position[0].length+1;
@@ -140,8 +150,8 @@
 				dirDisplay = new google.maps.DirectionsRenderer();
 				dirDisplay.setMap(map);
 
-				var from = $("#from").val();
-				var to = $("#to").val();
+				var from = getFrom();
+				var to = getTo();				
 
 				var request = {
 					origin: from,
