@@ -1,29 +1,50 @@
 <!doctype html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="main.js"></script>
-
-	<style>
-		#map {
-			height: 700px;
-			width: 	1200px;
-		}
-	</style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="semantic/packaged/javascript/semantic.js"></script>
+    <script src="script/main.js"></script>
+    <link rel="stylesheet" type="text/css" href="semantic/packaged/css/semantic.css">
+    <link rel="stylesheet" type="text/css" href="style/main.css">
 </head>
 <body>
-	<label for="from">起點</label>
-	<input type="text" id="from" value="高雄市小港區" />
-	<label for="to">終點</label>
-	<input type="text" id="to" value="高雄市楠梓區" />
-	<button id="submit">送出</button>
-	<button id="clear">clear</button>
-	<hr>
+    <div class="ui grid">
+        <div class="two wide column"></div>
 
-	<div id="map"></div>
+        <div class="twelve wide column">
 
-	<div id="camera"></div>
+            <h2 class="ui black block center aligned header">
+                Travel Weather
+            </h2>
+
+            <div class="ui small input">
+                <input id="from" type="text" placeholder="起點..." value="高雄市楠梓區">
+            </div>
+
+            <div class="ui small input">
+                <input id="to" type="text" placeholder="終點...">
+            </div>
+
+            <div class="ui selection dropdown">
+                <div class="text">景點列表</div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <div class="item" data-value="北橫公路">北橫公路</div>
+                    <div class="item" data-value="烏來風景區">烏來風景區</div>
+                    <div class="item" data-value="墾丁風景區">墾丁風景區</div>
+                </div>
+            </div>
+
+            <div id="submit" class="ui small button"><i class="search icon"></i></div>
+
+            <div class="ui divider"></div>
+
+            <div id="map"></div>
+        </div><!--end of .televe.wide.column-->
+
+        <div class="two wide column"></div>
+    </div><!--end of .ui.grid-->
 </body>
 </html>
 

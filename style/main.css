@@ -1,0 +1,12 @@
+.button {
+    font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif"Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+
+.ui.selection.dropdown, .ui.selection.dropdown .menu {
+    font-size: 14px;
+}
+
+#map {
+    height: 640px;
+    width: 	100%;
+}
