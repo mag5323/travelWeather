@@ -127,14 +127,19 @@ $(document).ready(function(e){
         return to = $("#to").val();
     }
 
+    /* getting travelMode */
+    function getTravelMode() {
+        return $(".toggle").filter(".active").attr("id");
+    }
+
     /* google map initialize */
     function init() {
-        var i;
         var mapOptions = {
             zoom: 8,
             center: new google.maps.LatLng(23.5986813, 121.0173533),
             mapTypeId: google.maps.MapTypeId.ROADMAP
         }
+
         map = new google.maps.Map(document.getElementById("map"), mapOptions);
     }
 
@@ -147,6 +152,7 @@ $(document).ready(function(e){
 
     /* route service/display constructing, map target */
     $("#submit").on("click", function(){
+
         if (times > 0) {
             init();
         }
@@ -158,11 +164,12 @@ $(document).ready(function(e){
 
         var from = getFrom();
         var to = getTo();
+        var travelMode = getTravelMode();
 
         var request = {
             origin: from,
             destination: to,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING
+            travelMode: google.maps.DirectionsTravelMode[travelMode]
         };
 
         dirService.route(request, function(response, status) {
@@ -194,6 +201,18 @@ $(document).ready(function(e){
         onChange: function (val) {
             $("#to").val(val);
         }
+    });
+
+    $(".toggle").on("click",function(){
+//        $(".toggle").each(function(){
+//            if ($(this).hasClass("active")) {
+//                $(this).removeClass("active");
+//            }
+//        });
+
+        $(".toggle").filter(".active").removeClass("active");
+
+        $(this).addClass("active");
     });
 });
 
