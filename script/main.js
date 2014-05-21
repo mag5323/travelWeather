@@ -24,19 +24,23 @@ $(document).ready(function(e){
             closeInfoWindow();
 
             map.setCenter(marker.getPosition());
-            if (camera.url.indexOf("snapshot") > -1) {
-                infoWindow = new google.maps.InfoWindow({
-                            content: "<img class='snap' src='"+camera.url+"' width='320px' height='240px' onload='refreshMJpeg(this, \""+camera.url+"\")' />"
-                });
-
-            }else {
-                infoWindow = new google.maps.InfoWindow({
-                            content: "<img class='cctv' src='"+camera.url+"' width='320px' height='240px' />"
-                });
-            }
+            var snap = camera.url.indexOf("snapshot");
+            infoWindow = new google.maps.InfoWindow({
+                content: infoWindowContent(snap, camera.url)
+            });
 
             infoWindow.open(map, marker);
         });
+    }
+
+    /* setup camera's image to info window content */
+    function infoWindowContent(snap, url) {
+        if (snap>-1) {
+            return "<img class='snap' src='"+ url +"' width='320px' height='240px'"+
+                   "onload='refreshMJpeg(this, '"+ url +")' />";
+        }
+
+        return "<img class='cctv' src='"+ url +"' width='320px' height='240px' />";
     }
 
     /* classify routing path's point */
@@ -125,7 +129,6 @@ $(document).ready(function(e){
 
     /* google map initialize */
     function init() {
-        // var deviceLen = position[0].length+1;
         var i;
         var mapOptions = {
             zoom: 8,
@@ -170,7 +173,7 @@ $(document).ready(function(e){
                 var path = response.routes[0].overview_polyline.points;
                 var points = google.maps.geometry.encoding.decodePath(path);
 
-                $.getJSON("camera.json", function(cameras){
+                $.getJSON("script/camera.json", function(cameras){
 
                     /* roughly iterating points array by 5 step */
                     for (var i=0; i<points.length; i+=5) {
