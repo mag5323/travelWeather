@@ -25,19 +25,55 @@ $(document).ready(function(e){
 
             map.setCenter(marker.getPosition());
             var snap = camera.url.indexOf("snapshot");
+            var content = infoWindowContent(snap, camera.url);
+
             infoWindow = new google.maps.InfoWindow({
-                content: infoWindowContent(snap, camera.url)
+                content: content
             });
 
             infoWindow.open(map, marker);
+            setCameraStatus(snap);
         });
+    }
+
+    /* setup camera's status image*/
+    function setCameraStatus(snap) {
+        var $img = $(".cctv").last();
+        if (snap>-1) {
+            $img = $(".snap").last();
+        }
+
+        setCamStatElement($img);
+
+        $img.on({
+            error: function() {
+                var $i = $("i").last();
+                $i.removeClass("loading").addClass("red warning");
+                $i.next().text("載入失敗");
+            }, load: function() {
+                $img.show();
+                $(".loading").hide().next().hide();
+            }
+        });
+    }
+
+    /* setup icon,class,style*/
+    function setCamStatElement($img){
+        var statIcon = "<i class='huge loading icon'></i><p></p>";
+        var align = "ui center aligned basic segment";
+        var styles = {
+            width: "320px",
+            height: "240px",
+            overflow: "hidden"
+        };
+
+        $img.hide().parent().css(styles).addClass(align).append(statIcon);
     }
 
     /* setup camera's image to info window content */
     function infoWindowContent(snap, url) {
         if (snap>-1) {
-            return "<img class='snap' src='"+ url +"' width='320px' height='240px'"+
-                   "onload='refreshMJpeg(this, '"+ url +")' />";
+            return "<img class='snap' src='"+ url +"' width='320px' height='240px' onload='refreshMJpeg(this, \""+ url +"\")' />";
         }
 
         return "<img class='cctv' src='"+ url +"' width='320px' height='240px' />";
@@ -204,16 +240,9 @@ $(document).ready(function(e){
     });
 
     $(".toggle").on("click",function(){
-//        $(".toggle").each(function(){
-//            if ($(this).hasClass("active")) {
-//                $(this).removeClass("active");
-//            }
-//        });
-
         $(".toggle").filter(".active").removeClass("active");
-
         $(this).addClass("active");
-    });
+    }).click();
 });
 
 function refreshMJpeg(obj, url){

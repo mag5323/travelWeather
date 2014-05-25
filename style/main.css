@@ -6,6 +6,19 @@
     font-size: 14px;
 }
 
+.ui.basic.segment {
+    padding: 0;
+}
+
+i.huge.icon {
+    margin: 22% 0 0 0;
+}
+
+p {
+    font-size: xx-large;
+    margin: 0;
+}
+
 #map {
     height: 640px;
     width: 	100%;
