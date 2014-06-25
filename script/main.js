@@ -213,7 +213,7 @@ $(document).ready(function(e){
                 dirDisplay.setDirections(response);
 
                 /* change route into points array */
-                var path = response.routes[0].overview_polyline.points;
+                var path = response.routes[0].overview_polyline;
                 var points = google.maps.geometry.encoding.decodePath(path);
 
                 $.getJSON("script/camera.json", function(cameras){
