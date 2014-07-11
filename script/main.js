@@ -136,7 +136,7 @@ $(document).ready(function(e){
         by calculating their straight-line distance */
     function isOnThePath(point, camera) {
         var xSum = Math.pow(point.k-camera.lat, 2);
-        var ySum = Math.pow(point.A-camera.lng, 2);
+        var ySum = Math.pow(point.B-camera.lng, 2);
         var distance = Math.sqrt(xSum+ySum);
         if (Math.abs(Math.floor(distance)-distance) < 0.005) {
             return true;
