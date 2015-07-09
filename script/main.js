@@ -81,52 +81,52 @@ $(document).ready(function(e){
 
     /* classify routing path's point */
     function classify(item){
-        if (item.A>121.0) {
-            if (item.k>25.0) {
+        if (item.F>121.0) {
+            if (item.A>25.0) {
                 return 0;
             }
 
-            if (item.k>24.5) {
+            if (item.A>24.5) {
                 return 2;
             }
 
-            if (item.k>24.0) {
+            if (item.A>24.0) {
                 return 4;
             }
 
-            if (item.k>23.5) {
+            if (item.A>23.5) {
                 return 6;
             }
 
-            if (item.k>23.0) {
+            if (item.A>23.0) {
                 return 8;
             }
 
-            if (item.k>22.5) {
+            if (item.A>22.5) {
                 return 10;
             }
         } else {
-            if (item.k>24.5) {
+            if (item.A>24.5) {
               return 1;
             }
 
-            if (item.k>24.0) {
+            if (item.A>24.0) {
               return 3;
             }
 
-            if (item.k>23.5) {
+            if (item.A>23.5) {
               return 5;
             }
 
-            if (item.k>23.0) {
+            if (item.A>23.0) {
               return 7;
             }
 
-            if (item.k>22.5) {
+            if (item.A>22.5) {
               return 9;
             }
 
-            if (item.k>21.5) {
+            if (item.A>21.5) {
               return 11;
             }
         }
