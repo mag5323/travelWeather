@@ -15,7 +15,7 @@ $(document).ready(function(e){
 
     var marker = new google.maps.Marker({
       position: myLatlng,
-      title: camera.lat +","+ camera.lng
+      title: camera.lat + "," + camera.lng
     });
 
     marker.setMap(map);
@@ -58,7 +58,7 @@ $(document).ready(function(e){
   }
 
   /* setup icon,class,style*/
-  function setCamStatElement($img){
+  function setCamStatElement($img) {
     var statIcon = "<i class='huge loading icon'></i><p></p>";
     var align = "ui center aligned basic segment";
     var styles = {
@@ -72,15 +72,15 @@ $(document).ready(function(e){
 
   /* setup camera's image to info window content */
   function infoWindowContent(snap, url) {
-    if (snap>-1) {
-      return "<img class='snap' src='"+ url +"' width='320px' height='240px' onload='refreshMJpeg(this, \""+ url +"\")' />";
+    if (snap > -1) {
+      return "<img class='snap' src='" + url + "' width='320px' height='240px' onload='refreshMJpeg(this, \"" + url + "\")' />";
     }
 
-    return "<img class='cctv' src='"+ url +"' width='320px' height='240px' />";
+    return "<img class='cctv' src='" + url + "' width='320px' height='240px' />";
   }
 
   /* classify routing path's point */
-  function classify(item){
+  function classify(item) {
     if (item.F>121.0) {
       if (item.A>25.0) {
         return 0;
@@ -135,18 +135,18 @@ $(document).ready(function(e){
   /*  checking if the camera is on the route
       by calculating their straight-line distance */
   function isOnThePath(point, camera) {
-    var xSum = Math.pow(point.A-camera.lat, 2);
-    var ySum = Math.pow(point.F-camera.lng, 2);
-    var distance = Math.sqrt(xSum+ySum);
-    if (Math.abs(Math.floor(distance)-distance) < 0.005) {
+    var xSum = Math.pow(point.A - camera.lat, 2);
+    var ySum = Math.pow(point.F - camera.lng, 2);
+    var distance = Math.sqrt(xSum + ySum);
+    if (Math.abs(Math.floor(distance) - distance) < 0.005) {
       return true;
     }
     return false;
   }
 
   /* close other infowindow */
-  function closeInfoWindow(){
-    if(infoWindow != null){
+  function closeInfoWindow() {
+    if (infoWindow != null) {
       infoWindow.close();
       clearTimeout(cctvTimer);
       $(".snap, .cctv").remove();
@@ -187,7 +187,7 @@ $(document).ready(function(e){
   });
 
   /* route service/display constructing, map target */
-  $("#submit").on("click", function(){
+  $("#submit").on("click", function() {
 
     if (times > 0) {
       init();
@@ -216,13 +216,13 @@ $(document).ready(function(e){
         var path = response.routes[0].overview_polyline;
         var points = google.maps.geometry.encoding.decodePath(path);
 
-        $.getJSON("script/camera.json", function(cameras){
+        $.getJSON("script/camera.json", function(cameras) {
 
           /* roughly iterating points array by 5 step */
           for (var i=0; i<points.length; i+=5) {
             var group = classify(points[i]);
 
-            $.each(cameras[group], function(j, camera){
+            $.each(cameras[group], function(j, camera) {
               if (isOnThePath(points[i], camera)) {
                 setUpCamera(camera);
               }
@@ -239,15 +239,15 @@ $(document).ready(function(e){
     }
   });
 
-  $(".toggle").on("click",function(){
+  $(".toggle").on("click",function() {
     $(".toggle").filter(".active").removeClass("active");
     $(this).addClass("active");
   }).click();
 });
 
-function refreshMJpeg(obj, url){
-  if( $(".snap").length > 0 ){
-    cctvTimer = setTimeout(function(){
+function refreshMJpeg(obj, u rl) {
+  if ($(".snap").length > 0 ) {
+    cctvTimer = setTimeout(function() {
       obj.src = url + "?t=" + new Date().getTime();
     },100);
   }
