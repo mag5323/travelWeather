@@ -245,9 +245,9 @@ $(document).ready(function(e){
   }).click();
 });
 
-function refreshMJpeg(obj, u rl) {
-  if ($(".snap").length > 0 ) {
-    cctvTimer = setTimeout(function() {
+function refreshMJpeg(obj, url) {
+  if ($(".snap").length > 0) {
+    cctvTimer = setTimeout(function(){
       obj.src = url + "?t=" + new Date().getTime();
     },100);
   }
